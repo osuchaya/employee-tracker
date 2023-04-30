@@ -1,24 +1,16 @@
 const inquirer = require('inquirer');
 //Import mysql2
-const mysql = require('mysql2');
-//Import console.table for adding data into table
-const consoleTable = require('console.table');
 
+//Import console.table for adding data into table
+const cTable = require('console.table');
+const Database = require('./db.js');
 
 
 
 
 //Connect to database
+const db = new Database()
 
-const db = mysql.createConnection(
-    {
-        host: 'localhost',
-        user: 'root',
-        password: 'password',
-        database: 'et_db'
-    },
-    console.log(`Connected to the et_db database.`)
-);
 
 const question =
 {
@@ -28,66 +20,87 @@ const question =
     name: 'Action',
 }
 let quit = false;
-function getRoles() {
-    return db.promise().query(`SELECT * FROM roles`);
-
-}
-function getAddEmployeeQuestions() {
- return getRoles().then(roles => { 
-    console.log(roles);
-    return [
-    {
-        type: 'input',
-        message: "What is employee's first name?",
-        name: 'firstName'
-    },
-    {
-        type: 'input',
-        message: "What is employee's last name?",
-        name: 'lastName'
-    },
-    {
-        type: 'list',
-        message: "What is employee's role?",
-        name: 'roleID',
-        choices: roles
-    },
-    {
-        type: 'list',
-        message: "Who is the employee's manager?",
-        name: 'manager',
-        choices: manager
+function converttoChoices(names) {
+    let choices = [];
+    for (let i = 0; i < names.length; i++) {
+        let choice = {
+            name: names[i],
+            value: i + 1
+        }
+        choices.push(choice);
     }
-] }
-) }
+
+    return choices;
+}
+
+function getAddEmployeeQuestions() {
+    return db.getRoles().then(roles => {
+
+        return db.getManagers().then(managers => {
+
+
+            return [
+                {
+                    type: 'input',
+                    message: "What is employee's first name?",
+                    name: 'firstName'
+                },
+                {
+                    type: 'input',
+                    message: "What is employee's last name?",
+                    name: 'lastName'
+                },
+                {
+                    type: 'list',
+                    message: "What is employee's role?",
+                    name: 'roleID',
+                    choices: converttoChoices(roles)
+                },
+                {
+                    type: 'list',
+                    message: "Who is the employee's manager?",
+                    name: 'managerID',
+                    choices: converttoChoices(managers)
+                }
+            ]
+        })
+    }
+    )
+}
 function addEmployee() {
-    return inquirer.prompt(getAddEmployeeQuestions())
+    // return inquirer.prompt(getAddEmployeeQuestions())
+    return getAddEmployeeQuestions().then(questions => {
+        return inquirer.prompt(questions)
+    })
 };
 
 function promptQuestion() {
     return inquirer.prompt(question).then(({ Action }) => {
         if (Action === 'Add Employee') {
-            let query = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`;
-            addEmployee().then(({firstName, lastName, roleID, managerID}) => {
-                db.query(query, [firstName, lastName, roleID, managerID], (err, result) => {
-                    if (err) {
-                        console.log(err);
-                    }
-                    console.log(result);
-                    
-                })
+
+            return addEmployee().then(({ firstName, lastName, roleID, managerID }) => {
+                db.insertEmployee(firstName, lastName, roleID, managerID)
+                    .then(result => {
+                        return promptQuestion()
+                    })
             })
-            
+
         }
-        if (Action !== 'Quit') {
+        else if (Action === 'View All Employees') {
+            return db.viewEmployees().then((result => {
+                console.table(result);
+            }));
+
+        }
+        else if (Action !== 'Quit') {
             return promptQuestion();
         }
+      
         return Action;
     })
 }
-promptQuestion().then(({ Action }) => {
-    console.log('Done')
-})
+promptQuestion();
+
 
 
 
