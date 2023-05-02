@@ -20,7 +20,16 @@ This project is part of Module 12 on MySQL where the author used Command Line In
 
 
 ## Installation
-Install Node version 16.0 in order to run this application successfully. Please ensure to install as part of npm packages: inquirer package version 8.2.4, Console table and MySQL2.
+Install Node version 16.0 in order to run this application successfully. Please ensure to install as part of npm packages: inquirer package version 8.2.4, Console table and MySQL2. Upon successful installation, run the app by typing 'node index.js' (as index.js is the main file) or alternative type 'npm run start' in Integrated Terminal. Initialize the database by doing the following in integrated terminal: 
+1. Type mysql -u root -p
+2. Type in your password for MySQL
+3. Type USE et_db;
+4. Type SOURCE schema.sql;
+5. Type SOURCE seeds.sql;
+6. Type Quit;
+7. Type in integrated terminal 'npm run start' or 'node index.js'
+
+Follow the prompt to use this Employee Tracker App.
 
 ## Usage
 After cloning the code files into your local machine, run the application in your terminal by typing 'run node index.js'. This will initiate prompts to select options. Users can choose which option they would like to application to do.
