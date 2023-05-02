@@ -40,12 +40,20 @@ class Database {
     }
 
     viewEmployees() {
-        let query = `SELECT id, first_name, last_name, title, department, salary, manager FROM employee 
-        INNER JOIN role ON employee.role_id = role.id INNER JOIN department ON department.name = role.department_id`;
+        let query = `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary,
+         CONCAT(manager.first_name," ",manager.last_name) AS manager FROM employee 
+        INNER JOIN role ON employee.role_id=role.id INNER JOIN department ON department.id=role.department_id 
+        LEFT JOIN employee AS manager ON employee.manager_id=manager.id`;
 
         return this.db.promise().query(query).then(result => {
             return result[0];
             
+        })
+    }
+    viewDepartment() {
+        let query = `SELECT id, name FROM department`;
+        return this.db.promise().query(query).then(result => {
+            return result[0];
         })
     }
  }

@@ -16,7 +16,7 @@ const question =
 {
     type: 'list',
     message: 'What would you like to do?',
-    choices: ['View All Employees', 'Add Employee', 'Quit'],
+    choices: ['View All Employees', 'View All Departments','Add Employee', 'Quit'],
     name: 'Action',
 }
 let quit = false;
@@ -89,8 +89,15 @@ function promptQuestion() {
         else if (Action === 'View All Employees') {
             return db.viewEmployees().then((result => {
                 console.table(result);
+                return promptQuestion();
             }));
 
+        }
+        else if (Action === 'View All Departments') {
+            return db.viewDepartment().then((result) => {
+                console.table(result);
+                return promptQuestion();
+            })
         }
         else if (Action !== 'Quit') {
             return promptQuestion();
