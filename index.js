@@ -180,9 +180,4 @@ function promptQuestion() {
 }
 promptQuestion();
 
-// db.query(`SELECT * FROM employee`, (err, result) => {
-//     if (err) {
-//         console.log(err);
-//     }
-//     console.log(result);
-// });
+
