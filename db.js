@@ -62,7 +62,6 @@ class Database {
     updateEmployeeRole(employee_id, role_id) {
         let query = `UPDATE employee SET role_id=? WHERE employee.id=?`;
         return this.db.promise().query(query, [role_id, employee_id])
-
     }
     viewEmployees() {
         let query = `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary,

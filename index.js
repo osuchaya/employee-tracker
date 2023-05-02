@@ -103,10 +103,13 @@ function getUpdateEmployeeQuestions() {
           type: "list",
           message: "Which employee's role do you want to update?",
           choices: converttoChoices(employees),
+          name: "employee"
         },
         {
             type: "list",
-            message: ""
+            message: "Which role do you want to assign the selected employee?",
+            choices: converttoChoices(roles),
+            name: "role"
         }
       ];
     });
@@ -142,7 +145,18 @@ function promptQuestion() {
             return promptQuestion();
           });
         });
-    } else if (Action === "View All Employees") {
+    } else if (Action === "Update Employee Role") {
+        return getUpdateEmployeeQuestions()
+        .then((questions) => {
+            return inquirer.prompt(questions);
+        })
+        .then(({ employee, role }) => {
+            db.updateEmployeeRole(employee, role).then((result) => {
+                return promptQuestion();
+            });
+        });
+    }
+    else if (Action === "View All Employees") {
       return db.viewEmployees().then((result) => {
         console.table(result);
         return promptQuestion();
